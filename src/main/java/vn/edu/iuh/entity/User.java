@@ -2,6 +2,7 @@ package vn.edu.iuh.entity;
 
 import javax.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,5 +20,6 @@ public class User  extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @EqualsAndHashCode.Exclude
     private Set<Role> roles = new HashSet<>();
 }

@@ -3,17 +3,23 @@ package vn.edu.iuh.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import vn.edu.iuh.authen.UserPrincipal;
+import vn.edu.iuh.entity.Role;
 import vn.edu.iuh.entity.Token;
 import vn.edu.iuh.entity.User;
+import vn.edu.iuh.service.RoleService;
 import vn.edu.iuh.service.TokenService;
 import vn.edu.iuh.service.UserService;
 import vn.edu.iuh.util.JwtTokenUtil;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 public class AuthController {
@@ -23,10 +29,15 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private RoleService roleService;
 
     @PostMapping("/register")
     public User register(@RequestBody  User user) {
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleService.findById(13L));
+        user.setRoles(roles);
         return userService.createUser(user);
     }
 
@@ -47,6 +58,7 @@ public class AuthController {
     }
 
     @GetMapping("/hello")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER_READ')")
     public ResponseEntity hello() {
         return ResponseEntity.ok("hello word!");
     }
