@@ -1,19 +1,11 @@
 package vn.edu.iuh.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import lombok.Data;
 
 @Entity
-@Table(name = "t_permission")
-@Getter
-@Setter
-public class Permission extends BaseEntity {
-
-    private String permissionName;
-
-    private String permissionKey;
-
+@Data
+public class Permission extends BaseEntity{
+    private String name;
+    private String key;
 }
