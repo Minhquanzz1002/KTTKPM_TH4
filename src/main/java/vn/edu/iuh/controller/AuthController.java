@@ -13,9 +13,12 @@ import vn.edu.iuh.entity.Token;
 import vn.edu.iuh.entity.User;
 import vn.edu.iuh.service.TokenService;
 import vn.edu.iuh.service.UserService;
+import vn.edu.iuh.util.JwtTokenUtil;
 
 @RestController
 public class AuthController {
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private UserService userService;
     @Autowired
@@ -29,14 +32,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
+        System.out.println("toi day");
         UserPrincipal userPrincipal = userService.findByUserName(user.getUsername());
+        System.out.println("toi day 2");
         if (user == null || !new BCryptPasswordEncoder().matches(user.getPassword(), userPrincipal.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account or password is not valid!");
         }
         Token token = new Token();
-//        token.setToken();
-//        token.setExpDate();
-        token.setCreatedBy(user.getId());
+        token.setToken(jwtTokenUtil.generateToken(userPrincipal));
+        token.setExpDate(jwtTokenUtil.generateExpirationDate());
+        token.setCreatedBy(userPrincipal.getUserId());
         tokenService.createToken(token);
         return ResponseEntity.ok(token.getToken());
     }
